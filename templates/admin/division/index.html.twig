@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <br>
+    <div class="container">
+        <a href="{{ path('create-division') }}" class="btn btn-success">Créer une division</a>
+        <table id="divisionTable" class="table table-dark table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Abréviation</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for division in divisions %}
+                <tr>
+                    <td>{{ division.nom }}</td>
+                    <td>{{ division.abreviation }}</td>
+                    <td>
+                        <a href="{{ path('edit-division', {'id': division.id}) }}" class="btn btn-sm btn-success">Modifier</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(document).ready(function(){
+            $('#divisionTable').DataTable();
+        });
+    </script>
+{% endblock %}

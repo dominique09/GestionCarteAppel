@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <br>
+    <div class="container">
+        <a href="{{ path('create-intervenant') }}" class="btn btn-success">Créer un intervenant</a>
+        <table id="userTable" class="table table-dark table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>Prénom</th>
+                <th>Nom</th>
+                <th>Formation</th>
+                <th>Division</th>
+                <th>Initiales</th>
+                <th>Actif</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for intervenant in intervenants %}
+                <tr>
+                    <td>{{ intervenant.firstname }}</td>
+                    <td>{{ intervenant.lastname }}</td>
+                    <td>{{ intervenant.formation.abreviation }}</td>
+                    <td>{{ intervenant.division.nom }} ({{ intervenant.division.abreviation }})</td>
+                    <td>{{ intervenant.initiales }}</td>
+                    <td>
+                        {% if intervenant.active %}
+                            <span class="badge badge-success">Actif</span>
+                        {% else %}
+                            <span class="badge badge-danger">Inactif</span>
+                        {% endif %}
+                        {% if intervenant.equipes %}
+                            {{ intervenant.isAssigned() }}
+                        {% endif %}
+                        {% for eq in intervenant.equipes %}
+                            -- {{ eq.identifiant }} ({{ eq.isActive() }})
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <a href="{{ path('edit-intervenant', {'id': intervenant.id}) }}" class="btn btn-sm btn-success">Modifier</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(document).ready(function(){
+            $('#userTable').DataTable();
+        });
+    </script>
+{% endblock %}

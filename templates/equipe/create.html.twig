@@ -1,0 +1,11 @@
+{% extends "template.html.twig" %}
+
+{% block body %}
+<div class="container">
+    <h2>{{ titre }}</h2>
+    {{ form(form,  {'attr': {'novalidate': 'novalidate'}}) }}
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    {{ form_end(form) }}
+</div>
+{% endblock %}

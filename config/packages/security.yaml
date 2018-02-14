@@ -1,0 +1,37 @@
+security:
+    encoders:
+        App\Entity\User:
+            algorithm: bcrypt
+
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    providers:
+        our_db_provider:
+            entity:
+                class: App\Entity\User
+                # if you're using multiple entity managers
+                # manager_name: customer
+
+    access_control:
+      - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY}
+      - { path: ^/admin/role, roles: ROLE_SUPER_ADMIN}
+      - { path: ^/admin/type-equipe, roles: ROLE_SUPER_ADMIN}
+      - { path: ^/admin/formation, roles: ROLE_SUPER_ADMIN}
+      - { path: ^/admin/appelant, roles: ROLE_SUPER_ADMIN}
+      - { path: ^/admin/user, roles: ROLE_SUPER_ADMIN}
+      - { path: ^/admin, roles: ROLE_ADMIN}
+      - { path: ^/, roles: ROLE_USER}
+
+    firewalls:
+        main:
+            anonymous: ~
+            form_login:
+              csrf_token_generator: security.csrf.token_manager
+              login_path: login
+              check_path: login
+            remember_me:
+              secret: '%kernel.secret%'
+              lifetime: 604800
+              path: /
+            logout:
+              path: /logout
+              target: /

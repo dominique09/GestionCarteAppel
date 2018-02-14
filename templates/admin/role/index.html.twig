@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <br>
+    <div class="container">
+        <a href="{{ path('create-role') }}" class="btn btn-success">Créer un role</a>
+        <table id="roleTable" class="table table-dark table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Role</th>
+                <th>Users</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for role in roles %}
+                <tr>
+                    <td>{{ role.name }}</td>
+                    <td>{{ role.role }}</td>
+                    <td>{% for user in role.users %}
+                            --{{ user.username }}<br>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <a href="{{ path('edit-role', {'id': role.id}) }}" class="btn btn-sm btn-success">Modifier</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(document).ready(function(){
+            $('#roleTable').DataTable();
+        });
+    </script>
+{% endblock %}

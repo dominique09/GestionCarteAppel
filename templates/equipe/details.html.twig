@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container">
+    <h2>Détails</h2>
+    <ul>
+        <li><strong>Identifiant : </strong> {{ equipe.identifiant }} </li>
+        <li><strong>Type d'équipe : </strong> {{ equipe.typeEquipe.name }} </li>
+    </ul>
+    <textarea disabled class="form-control" rows="15">
+        {% for log in equipe.logs %}
+            {{ log.toString() }}
+        {% endfor %}
+    </textarea>
+</div>
+{% endblock %}

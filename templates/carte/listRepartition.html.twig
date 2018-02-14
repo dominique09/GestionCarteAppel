@@ -1,0 +1,124 @@
+<tr class="bg-{{ carte.getStatusColor() }}">
+    <td rowspan="{{ carte.assignations|length + 1 }}">
+        <a href="#" class="btn btn-primary btn-block">{{ carte.id }}</a>
+        {% if carte.volanteDemande %}
+            <button class="btn btn-danger btn-block"  data-toggle="modal" data-target="#assigner-{{ carte.id }}"><i class="fas fa-ambulance"></i></button>
+        {% else %}
+            <a href="{{ path('api-carte-demander-volante', {'id':carte.id}) }}" class="btn btn-info btn-block"><i class="fas fa-ambulance"></i></a>
+        {% endif %}
+    </td>
+    <td>{{ carte.emplacement }}</td>
+    <td>{{ carte.priorite }}</td>
+    <td>{{ carte.appelant.name }}</td>
+    <td>
+        <div class="btn-group btn-group-sm" role="group" aria-label="Statut">
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#assigner-{{ carte.id }}">
+                Assigner</button>
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#annuler-{{ carte.id }}">
+                Annuler</button>
+            <a href="#" class="btn btn-info {{ ((carte.getAssignationsEnCours() | length) > 0)?'disabled':'' }}">Fermer</a>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="assigner-{{ carte.id }}" tabindex="-1" role="dialog" aria-labelledby="assigner-{{ carte.id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Assigner une équipe</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+
+                        {% for type in types_equipe %}
+                        <div class="card">
+                            <div class="card-header bg-{{ type.color }}">
+                                <h3>{{ type.name }}</h3>
+                            </div>
+                            <div class="card-body">
+                        {% for equipe in equipes %}
+                            {% if equipe.typeEquipe == type %}
+                                <a href="{{ path('api-carte-assigner', {
+                                    'carte_id':carte.id,
+                                    'equipe_id':equipe.id
+                                }) }}" class="btn btn-{{ equipe.getDispoColor() }} {{ (equipe.hasAssignationEnCours(carte))?'disabled':'' }}">
+                                    {{ equipe.identifiant }}
+                                    {{ equipe.getDisplayMessage() | raw }}
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <a href="{{ path('api-carte-annuler-volante', {'id':carte.id}) }}" class="btn btn-warning">Annuler la volante</a>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="annuler-{{ carte.id }}" tabindex="-1" role="dialog" aria-labelledby="annuler-{{ carte.id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Assigner une équipe</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="{{ path('api-annuler-carte', {'id':carte.id}) }}" method="POST">
+                        <div class="modal-body">
+                            Êtes-vous certain de vouloir annuler la carte ? Toutes les assignations seront aussi annulées.
+                            <div class="form-group">
+                                <label for="raison"><strong>Raison : </strong></label>
+                            <input type="text" class="form-control" name="raison" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-danger">Oui</button>
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Non</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </td>
+    <td  rowspan="{{ carte.assignations|length + 1 }}">
+        <textarea class="form-control" disabled cols="40" rows="{{ carte.assignations|length + 1 }}">
+        {{ carte.description }}
+        </textarea>
+        <button class="btn btn-sm btn-success btn-block">Ajouter</button>
+    </td>
+</tr>
+{% for assignation in carte.assignations %}
+    <tr>
+    <td colspan="4" class="bg-{{ assignation.getColor() }}">
+        <a href="#" class="btn btn-{{ assignation.equipe.getDispoColor() }}">
+            {{ assignation.equipe.identifiant }}
+        </a>
+        <div class="btn-group btn-group-sm" role="group" aria-label="Statut">
+{% for etape in assignation.etapes %}
+    {% if (assignation.equipe.typeEquipe.name in etape.typesEquipe) or not etape.typesEquipe %}
+        {% set propValue = assignation.getProperty(etape.name) %}
+        {% if not propValue and assignation.isEnCours() %}
+            {% set disabled = (etape.previousRequired and not assignation.getProperty(etape.previousRequired)) %}
+            <a href="{{ path('api-assignation-etape', {'id':assignation.id,'etape':etape.name}) }}" class="btn btn-{{ etape.displayColorActive }} {{ (disabled)?'disabled':'' }}">
+                {{ etape.libele | raw }}
+            </a>
+        {% else %}
+            {% set tooltip = (propValue)?(propValue | date('Y-m-d H:i:s')):'N/A' %}
+            <button class="btn btn-{{ etape.displayColorDisabled }}" disabled data-toggle="tooltip" data-placement="top" data-html="true" title="{{ tooltip }}">
+                {{ etape.libele | raw }}</button>
+        {% endif %}
+    {% endif %}
+{% endfor %}
+        </div>
+        {% if assignation.dispatchedAt or assignation.cancelledAt or assignation.closedAt %}
+            <a href="{{ path('api-assignation-backward', {'id':assignation.id}) }}" class="btn btn-sm btn-light"><i class="fas fa-arrow-circle-left"></i></a>
+        {% endif %}
+    </td>
+</tr>
+    {% endfor %}

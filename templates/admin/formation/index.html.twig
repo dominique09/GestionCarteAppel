@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <br>
+    <div class="container">
+        <a href="{{ path('create-formation') }}" class="btn btn-success">Créer une formation</a>
+        <table id="userTable" class="table table-dark table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Abréviation</th>
+                <th>
+                    Intervenants
+                </th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for formation in formations %}
+                <tr>
+                    <td>{{ formation.nom }}</td>
+                    <td>{{ formation.abreviation }}</td>
+                    <td>
+                        {% for inter in formation.intervenants %}
+                            --{{ inter.initiales }}<br>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <a href="{{ path('edit-formation', {'id': formation.id}) }}" class="btn btn-sm btn-success">Modifier</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(document).ready(function(){
+            $('#userTable').DataTable();
+        });
+    </script>
+{% endblock %}

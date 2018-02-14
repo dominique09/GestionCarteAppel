@@ -1,0 +1,14 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+    {% for eq in equipes %}
+        {{ eq.identifiant }} |
+        {{ eq.isActive() }} |
+        {% for int in eq.intervenants %}
+            {{ int.initiales }}
+        {% endfor %}
+            |
+        <hr>
+    {% endfor %}
+
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container">
+    <a href="{{ path('create-user') }}" class="btn btn-success">Créer un usager</a>
+    <table id="userTable" class="table table-dark table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Roles</th>
+                <th>Active</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        {% for role in user.roles %}
+                             - {{ role.getName() }}<br>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% if user.Enabled %}
+                            <span class="badge badge-success">Actif</span>
+                        {% else %}
+                            <span class="badge badge-danger">Inactif</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ path('edit-user', {'id': user.id}) }}" class="btn btn-sm btn-success">Modifier</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(document).ready(function(){
+            $("#userTable").DataTable();
+        });
+    </script>
+{% endblock %}

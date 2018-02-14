@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <br>
+    <div class="container">
+        <h2>Modification d'un usager - <small>{{ user.username }}</small></h2>
+        {{ form(form,  {'attr': {'novalidate': 'novalidate'}}) }}
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+        <a href="{{ path('user') }}" class="btn btn-info">Retour à la liste</a>
+    </div>
+    <br>
+{% endblock %}

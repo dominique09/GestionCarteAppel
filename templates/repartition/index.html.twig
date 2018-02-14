@@ -1,0 +1,136 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <style>
+        *{
+            font-size: 12px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+    <div class="col-md-4">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover table-striped">
+                <thead class="thead-dark">
+                <tr>
+                    <th colspan="2">
+                        Légende :
+                        {% for type in typesEquipe %}
+                            <span class="badge badge-{{ type.color }}">{{ type.name }}</span>
+                        {% endfor %}
+                    </th>
+                    <th>
+                        <a href="{{ path('equipe-create') }}" target="_blank" class="btn btn-success btn-sm btn-block">
+                            Créer
+                        </a>
+                    </th>
+                </tr>
+                </thead>
+                <tbody id="tableauEquipe">
+                </tbody>
+                <tfoot>
+                    <tr><td colspan="3">
+                            <span id="updatedAtEquipe"></span>
+                        </td></tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover table-striped">
+                <thead class="thead-light">
+                    <tr>
+                        <th>#Carte</th>
+                        <th>Emplacement</th>
+                        <th>Prio</th>
+                        <th>Appelant</th>
+                        <th>Assingations</th>
+                        <th>
+                            <a href="{{ path('carte-create') }}" class="btn btn-sm btn-success btn-block">
+                                Ouvrir
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="tableauCarte">
+                </tbody>
+                <tfoot>
+                <tr><td colspan="6">
+                        <span id="updatedAtCarte"></span>
+                    </td></tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function(){
+
+            refresh();
+
+            function refresh() {
+                refreshEquipes();
+                refreshCartes();
+                setTimeout(refresh, 5000);
+            }
+
+            var lastUpdateEquipe = new Date;
+            var loadDataEquipe = true;
+
+            var lastUpdateCarte = new Date;
+            var loadDataCarte = true;
+
+            function refreshEquipes() {
+                $.ajax({
+                    url: '{{ path('api-equipe-repartition') }}',
+                    success: function (data) {
+                        var updatedAt = new Date(data.updated_at)
+
+                        if (lastUpdateEquipe <= updatedAt || loadDataEquipe) {
+                            updateEquipe(data.html);
+                            lastUpdateEquipe = new Date();
+                            loadDataEquipe = false;
+                            loadDataCarte = true;
+                        }
+
+                        $("#updatedAtEquipe").html(lastUpdateEquipe + " / " + updatedAt)
+                    }
+                });
+            }
+
+            function updateEquipe(data){
+                $("#tableauEquipe").html(data);
+            }
+
+            function refreshCartes() {
+                $.ajax({
+                    url: '{{ path('api-carte-repartition') }}',
+                    success: function (data) {
+                        var updatedAt = new Date(data.updated_at)
+
+                        if (lastUpdateCarte <= updatedAt || loadDataCarte) {
+                            updateCarte(data.html);
+                            lastUpdateCarte = new Date();
+                            loadDataCarte = false;
+                        }
+
+                        $("#updatedAtCarte").html(lastUpdateCarte + " / " + updatedAt)
+                    }
+                });
+            }
+
+            function updateCarte(data){
+                $("#tableauCarte").html(data);
+            }
+        });
+    </script>
+{% endblock %}

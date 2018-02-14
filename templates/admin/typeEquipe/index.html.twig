@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <br>
+    <div class="container">
+        <a href="{{ path('create-type-equipe') }}" class="btn btn-success">Créer un type d'équipe</a>
+        <table id="roleTable" class="table table-dark table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Équipes</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for typeEquipe in typeEquipes %}
+                <tr>
+                    <td>{{ typeEquipe.name }}</td>
+                    <td>
+                        {% for eq in typeEquipe.equipes %}
+                            -- {{ eq.identifiant }}<br>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <a href="{{ path('edit-type-equipe', {'id': typeEquipe.id}) }}" class="btn btn-sm btn-success">Modifier</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(document).ready(function(){
+            $('#roleTable').DataTable();
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends 'template.html.twig' %}
+{% block nav %}
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="{{ path('repartition') }}">Gestion Carte Appel</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('intervenant') }}">Intervenants</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('equipe') }}">Équipes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('intervenant') }}">Cartes</a>
+                    </li>
+                </ul>
+                <div class="clock">
+                    <span id="hr">00</span>
+                    <span> : </span>
+                    <span id="min">00</span>
+                    <span> : </span>
+                    <span id="sec">00</span>
+                </div>
+                <ul class="navbar-nav my-lg-0">
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Administration
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ path("user") }}">Utilisateurs</a>
+                            <a class="dropdown-item" href="{{ path("formation") }}">Formations</a>
+                            <a class="dropdown-item" href="{{ path("division") }}">Divisions</a>
+                            <a class="dropdown-item" href="{{ path("role") }}">Roles</a>
+                            <a class="dropdown-item" href="{{ path("type-equipe") }}">Types d'équipe</a>
+                            <a class="dropdown-item" href="{{ path("appelant") }}">Appelant</a>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav my-lg-0">
+                    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {{ app.user.username }}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{{ path('logout') }}">Déconnexion</a>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('login') }}">Connexion</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+{% endblock %}
+
+
+
+
+        {% block javascripts %}
+        <script>
+            var d,h,m,s,animate;
+
+            function init(){
+                d=new Date();
+                h=d.getHours();
+                m=d.getMinutes();
+                s=d.getSeconds();
+                clock();
+            };
+
+            function clock(){
+                s++;
+                if(s==60){
+                    s=0;
+                    m++;
+                    if(m==60){
+                        m=0;
+                        h++;
+                        if(h==24){
+                            h=0;
+                        }
+                    }
+                }
+                padZero('sec',s);
+                padZero('min',m);
+                padZero('hr',h);
+                animate=setTimeout(clock,1000);
+            };
+
+            function padZero(id,val){
+                if(val<10){
+                    val='0'+val;
+                }
+                document.getElementById(id).innerHTML=val;
+            };
+
+            window.onload=init;
+        </script>
+        {% endblock %}

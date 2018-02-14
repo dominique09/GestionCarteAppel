@@ -1,0 +1,155 @@
+<tr class="bg-{{ equipe.getDispoColor() }}">
+    <td rowspan='3'>
+        <a href='{{ path('equipe-details', {'id':equipe.id}) }}' class='btn btn-{{ equipe.typeEquipe.color }} btn-block'>
+            <strong>{{ equipe.identifiant }}</strong>
+        </a>
+    </td>
+    <td>
+        {% for intervenant in equipe.intervenants %}
+            <button type="button" class="btn btn-sm btn-{{ intervenant.formation.color }}" data-toggle="tooltip" data-placement="top" data-html="true" title='{{ intervenant.firstname }} {{ intervenant.lastname }} - {{ intervenant.formation.abreviation }}'>
+                {{ intervenant.initiales }}
+            </button>
+        {% endfor %}
+    </td>
+    <td>
+        {% if equipe.debutDispoAppels and not equipe.finDispoAppels %}
+        <button class="btn btn-info btn-sm btn-block" type="button" data-toggle="modal" data-target="#equipe-10-08-{{ equipe.id }}">
+            10-08</button>
+        {% endif %}
+    </td>
+</tr>
+<tr class="bg-{{ equipe.getDispoColor() }}">
+    <td>{{ equipe.getDisplayMessage() | raw }}</td>
+    <td></td>
+</tr>
+<tr class="bg-{{ equipe.getDispoColor() }}">
+    <td colspan="2">
+        {% if equipe.finDispoAppels %}
+            <a href="{{ path('equipe-dissoudre', {'id':equipe.id}) }}" class="btn btn-sm btn-danger btn-block">Dissoudre</a>
+        {% else %}
+            <div class="btn-group btn-group-sm" role="group" aria-label="Gestion du quart">
+                {% if equipe.debutDispoAppels %}
+                    <button class="btn btn-secondary" disabled data-toggle="tooltip" data-placement="top" data-html="true" title="{{ equipe.debutDispoAppels | date('Y-m-d H:i:s')}}">
+                        10-86
+                    </button>
+                    {% if equipe.retourVersCo %}
+                        <button class="btn btn-secondary" disabled data-toggle="tooltip" data-placement="top" data-html="true" title="{{ equipe.retourVersCo | date('Y-m-d H:i:s')}}">
+                            10-87
+                        </button>
+                        <a href="{{ path('equipe-fin-dispo', {'id':equipe.id}) }}" class="btn btn-secondary">10-89</a>
+                    {% else %}
+                        <a href="{{ path('equipe-retour-vers-co', {'id':equipe.id}) }}" class="btn btn-secondary">
+                            10-87
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <a href="{{ path('equipe-debut-dispo', {'id':equipe.id}) }}" class="btn btn-info">
+                    10-86
+                    </a>
+                {% endif %}
+            </div>
+            {% if equipe.debutDispoAppels %}
+                {% if not equipe.retourVersCo %}
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Operations">
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#equipe-10-16-{{ equipe.id }}">
+                            10-16</button>
+                        {% if equipe.endroitDestination %}
+                            <a href="{{ path('equipe-sur-place', {'id':equipe.id}) }}" class="btn btn-info">10-17</a>
+                        {% endif %}
+                    </div>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Statut">
+
+                        <a href="{{ path('equipe-dispo', {'id':equipe.id}) }}" class="btn btn-success">10-05</a>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#equipe-10-06-{{ equipe.id }}">
+                            10-06</button>
+                    </div>
+                {% else %}
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Statut">
+                        <a href="{{ path('equipe-dispo', {'id':equipe.id}) }}" class="btn btn-success">10-05</a>
+                    </div>
+                {% endif %}
+            {% endif %}
+
+        <!-- Modal -->
+        <div class="modal fade" id="equipe-10-16-{{ equipe.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">En direction de ...</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post" action="{{ path('equipe-direction', {'id':equipe.id}) }}">
+                        <div class="modal-body">
+                            <input type="text" class="form-control" maxlength="30" name="direction" />
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="equipe-10-06-{{ equipe.id }}" tabindex="-1" role="dialog" aria-labelledby="equipe-10-06-{{ equipe.id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Raison de l'indisponibilité</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post" action="{{ path('equipe-indispo', {'id':equipe.id}) }}">
+                        <div class="modal-body">
+                            <input type="text" class="form-control" maxlength="30" name="raison" />
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+            <div class="modal fade" id="equipe-10-08-{{ equipe.id }}" tabindex="-1" role="dialog" aria-labelledby="equipe-10-08-{{ equipe.id }}" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Ouverture de carte 10-08</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form method="post" action="{{ path('equipe-intercepte', {'id':equipe.id}) }}">
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="endroit"><strong>Endroit : </strong></label>
+                                    <input type="text" class="form-control" maxlength="30" name="endroit" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="endroit"><strong>Clawson : </strong></label>
+                                    <input type="text" class="form-control" maxlength="6" name="clawson" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="endroit"><strong>Détails : </strong></label>
+                                    <textarea class="form-control" name="details" ></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </td>
+</tr>
