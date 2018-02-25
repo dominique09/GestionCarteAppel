@@ -12,11 +12,10 @@ class SecurityController extends Controller
 {
     /**
      * @Route("/login", name="login")
-     * @param Request $request
      * @param AuthenticationUtils $authUtils
      * @return Response
      */
-    public function login(Request $request, AuthenticationUtils $authUtils)
+    public function login(AuthenticationUtils $authUtils)
     {
         //$this->denyAccessUnlessGranted("IS_AUTHENTICATED_FULLY");
 
@@ -34,6 +33,7 @@ class SecurityController extends Controller
      * @Route("/account/changePassword", name="change-password")
      */
     public function changePassword(Request $request){
+        $this->denyAccessUnlessGranted("IS_AUTHENTICATED_FULLY");
 
     }
 }
