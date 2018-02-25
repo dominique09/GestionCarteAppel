@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Appelant;
 use App\Entity\Assignation;
 use App\Entity\Carte;
 use App\Entity\Equipe;
@@ -41,11 +42,62 @@ class CarteController extends Controller
         }
 
         return $this->render('/carte/create.html.twig', array(
-            'titre' => "Création d'une équipe",
+            'titre' => "Création d'une carte",
             'form' => $form->createView()
         ));
     }
 
+    /**
+     * @Route("/carte/intercepte/{id}", name="equipe-intercepte", requirements={"id"="\d+"})
+     * @param $id
+     * @param Request $request
+     * @return Response
+     */
+    public function intercepteAction($id, Request $request){
+        $em = $this->getDoctrine()->getManager();
+        $repo = $em->getRepository(Equipe::class);
+        $repo_appelant = $em->getRepository(Appelant::class);
+        $equipe = $repo->find($id);
+        $appelantDef = $repo_appelant->findOneBy(["name" => 'ASJ']);
+        if(!$equipe)
+            throw new NotFoundHttpException("L'équipe n'a pas pu être trouvée.");
+
+        $carte = new Carte();
+        $carte->setEditingUserInitiales($this->getUser()->getInitiales());
+        $carte->setAppelant($appelantDef);
+        $carte->setEmplacement($equipe->getEndroitPresent());
+
+        $form = $this->createForm(CarteCreateType::class, $carte);
+
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid()){
+
+            $assignation = new Assignation();
+            $assignation->setCarte($carte);
+            $assignation->setEquipe($equipe);
+            $assignation->setDispatchedAt(new \DateTime());
+            $assignation->setDirectionPatientAt(new \DateTime());
+
+            $equipe->setEditingUserInitiales($this->getUser()->getInitiales());
+            $equipe->setRetourVersCo(null);
+            $equipe->setEndroitDestination(null);
+
+            $em->persist($carte);
+            $em->persist($assignation);
+            $em->persist($equipe);
+
+            $em->flush();
+
+            $this->addFlash("success", "La carte {$carte->getId()} a bien été créée.");
+
+            return $this->redirectToRoute('repartition');
+        }
+
+        return $this->render('/carte/create.html.twig', array(
+            'titre' => "Création d'une carte",
+            'form' => $form->createView()
+        ));
+    }
 
     /**
      * @Route("/api/carte/repartition", name="api-carte-repartition")
@@ -149,6 +201,31 @@ class CarteController extends Controller
 
         $em->persist($carte);
         $em->flush();
+
+        return $this->redirectToRoute('repartition');
+    }
+
+    /**
+     * @Route("/api/carte/terminer/{id}", name="api-terminer-carte", requirements={"id"="\d+"})
+     * @param $id
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function apiTerminerCarte($id, Request $request){
+        $em = $this->getDoctrine()->getManager();
+        $carte_repo = $em->getRepository(Carte::class);
+        $carte = $carte_repo->find($id);
+
+        if(!$carte)
+            throw new NotFoundHttpException("Oops.");
+
+        if(count($carte->getAssignationsEnCours()) > 0){
+            $this->addFlash('warning', "Au moins une assignation est toujours en cours.");
+        } else {
+            $carte->setClosedAt(new \DateTime());
+            $em->persist($carte);
+            $em->flush();
+        }
 
         return $this->redirectToRoute('repartition');
     }

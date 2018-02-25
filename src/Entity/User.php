@@ -53,6 +53,7 @@ class User implements AdvancedUserInterface, \Serializable
     private $roles;
 
     /**
+     * @Assert\NotBlank(message="Veuillez saisir un mot de passe.")
      * @Assert\Length(
      *      min = 8,
      *      max = 2048,
@@ -73,6 +74,8 @@ class User implements AdvancedUserInterface, \Serializable
      * )
      */
     private $plainPassword;
+
+    private $previousPassword;
 
     public function __construct()
     {
@@ -277,6 +280,22 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function getInitiales(){
         return $this->username;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPreviousPassword()
+    {
+        return $this->previousPassword;
+    }
+
+    /**
+     * @param mixed $previousPassword
+     */
+    public function setPreviousPassword($previousPassword): void
+    {
+        $this->previousPassword = $previousPassword;
     }
 
 }

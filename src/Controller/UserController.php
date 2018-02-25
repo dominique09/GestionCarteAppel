@@ -59,7 +59,7 @@ class UserController extends Controller
         }
 
 
-        return $this->render('/admin/user/form.html.twig',
+        return $this->render('/admin/user/create.html.twig',
             ['form' => $form->createView()]);
     }
 

@@ -398,7 +398,7 @@ class Equipe
     }
 
     public function dateToString($date){
-        if($date){
+         if($date){
             return date_format($date, 'Y-m-d H:i:s');
         }
 
@@ -410,7 +410,7 @@ class Equipe
      */
     public function getEditingUserInitiales(): string
     {
-        return ($this->editingUserInitiales)?$this->editingUserInitiales:"N/A";
+        return ($this->editingUserInitiales!=null)?$this->editingUserInitiales:"N/A";
     }
 
     /**
@@ -499,8 +499,15 @@ class Equipe
         if($this->endroitDestination)
             return "warning";
 
-        if(count($this->getAssignationsEnCours()) > 0)
+        if(count($this->getAssignationsEnCours()) > 0){
+            foreach ($this->getAssignationsEnCours() as $assignation){
+                if($assignation->getAssignedAt() && !$assignation->getDispatchedAt()){
+                    return "primary blink";
+                }
+            }
+
             return "primary";
+        }
 
         return "success";
     }

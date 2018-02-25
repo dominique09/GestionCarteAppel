@@ -2,7 +2,7 @@
     <td rowspan="{{ carte.assignations|length + 1 }}">
         <a href="#" class="btn btn-primary btn-block">{{ carte.id }}</a>
         {% if carte.volanteDemande %}
-            <button class="btn btn-danger btn-block"  data-toggle="modal" data-target="#assigner-{{ carte.id }}"><i class="fas fa-ambulance"></i></button>
+            <button class="btn btn-danger btn-block blink"  data-toggle="modal" data-target="#assigner-{{ carte.id }}"><i class="fas fa-ambulance"></i></button>
         {% else %}
             <a href="{{ path('api-carte-demander-volante', {'id':carte.id}) }}" class="btn btn-info btn-block"><i class="fas fa-ambulance"></i></a>
         {% endif %}
@@ -16,7 +16,7 @@
                 Assigner</button>
             <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#annuler-{{ carte.id }}">
                 Annuler</button>
-            <a href="#" class="btn btn-info {{ ((carte.getAssignationsEnCours() | length) > 0)?'disabled':'' }}">Fermer</a>
+            <a  href="{{ path('api-terminer-carte', {'id':carte.id}) }}" class="btn btn-info {{ ((carte.getAssignationsEnCours() | length) > 0)?'disabled':'' }}">Fermer</a>
         </div>
 
         <!-- Modal -->
@@ -53,7 +53,9 @@
                         {% endfor %}
                     </div>
                     <div class="modal-footer">
-                        <a href="{{ path('api-carte-annuler-volante', {'id':carte.id}) }}" class="btn btn-warning">Annuler la volante</a>
+                        {% if carte.volanteDemande %}
+                            <a href="{{ path('api-carte-annuler-volante', {'id':carte.id}) }}" class="btn btn-warning">Annuler la volante</a>
+                        {% endif %}
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
                     </div>
                 </div>

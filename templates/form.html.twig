@@ -8,7 +8,9 @@
         {{ form_start(form) }}
         {{ form_widget(form) }}
         {{ form_end(form) }}
-        <a href="{{ path(back_path) }}" class="btn btn-info">Retour à la liste</a>
+        {% if back_path is defined %}
+            <a href="{{ path(back_path) }}" class="btn btn-info">Retour à la liste</a>
+        {% endif %}
     </div>
     <br>
 {% endblock %}
