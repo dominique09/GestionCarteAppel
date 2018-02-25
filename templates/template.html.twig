@@ -10,9 +10,6 @@
         <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css">
         <link href="https://fonts.googleapis.com/css?family=Iceland" rel="stylesheet">
         <style>
-            div.clock{
-                margin-right:10px;
-            }
             div.clock > span{
                 color:red;
                 font-size:30px;
@@ -62,6 +59,7 @@
         <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
         <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+        <script src="{{ asset('js/clock.js') }}"></script>
         <script>
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip()
